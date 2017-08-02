@@ -3,7 +3,7 @@
 namespace App;
 
 
-use http\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 
 /**
  * Class IntegerConversion
