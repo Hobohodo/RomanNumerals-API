@@ -37,15 +37,18 @@ class IntegerConversion implements IntegerConversionInterface
      * @return string
      */
     public function toRomanNumerals($integer) {
-
-        if(!is_int($integer)){
+        if(!is_int($integer)) {
             //passing a non-integer to IntegerConversion is just wrong.
             throw new InvalidArgumentException("Non-integer passed for conversion");
         }
 
+        if($integer < 1 || $integer > 3999) {
+            throw new InvalidArgumentException("Integer passed for conversion outside valid range");
+        }
+
         $romanNumeral = "";
 
-        foreach($this->numeralValues as $numeral => $value){
+        foreach($this->numeralValues as $numeral => $value) {
             //how many times current numeral goes into the integer
             $matches = intval($integer/$value);
 
