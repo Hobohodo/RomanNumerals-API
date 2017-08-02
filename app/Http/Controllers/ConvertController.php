@@ -8,6 +8,7 @@
 namespace App\Http\Controllers;
 
 
+use App\IntegerConversion;
 use Illuminate\Http\Request;
 
 class ConvertController extends Controller
@@ -21,7 +22,13 @@ class ConvertController extends Controller
     public function convert(Request $request) {
         $integer = $request->input('integer');
 
+        $integerConverter = new IntegerConversion();
+
+        $romanNumeral = $integerConverter->toRomanNumerals($integer);
+
+
         return view("home", ["integer" => $integer]);
+        //TODO:store conversion, increment number of conversions, change view
     }
 
 }
