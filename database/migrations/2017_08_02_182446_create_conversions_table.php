@@ -4,22 +4,21 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateNumeralsTable extends Migration
+class CreateConversionsTable extends Migration
 {
     /**
      * Run the migrations.
-     * The reason I am not using integer as the primary key is in case of changing scope in future - maybe unrealistic
-     * for this test.
      *
      * @return void
      */
     public function up()
     {
-        Schema::create('numerals', function (Blueprint $table) {
+        Schema::create('conversions', function (Blueprint $table) {
             $table->increments('id');
-            $table->bigInteger("integer")->unique(); // No point duplicating converted numerals
-            $table->string("numeral");
+            $table->smallInteger('integer')->comment('Integers passed in for conversion');
+            $table->string('numeral')->comment('Converted numeral');
             $table->timestamps();
+            $table->index("integer");
         });
     }
 
@@ -30,6 +29,6 @@ class CreateNumeralsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('numerals');
+        Schema::dropIfExists('conversions');
     }
 }
