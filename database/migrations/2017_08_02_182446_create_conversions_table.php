@@ -16,7 +16,7 @@ class CreateConversionsTable extends Migration
         Schema::create('conversions', function (Blueprint $table) {
             $table->increments('id');
             $table->smallInteger('integer')->comment('Integers passed in for conversion');
-            $table->string('numeral')->comment('Converted numeral');
+            $table->string('numeral', 32)->comment('Converted numeral');
             $table->timestamps();
             $table->index("integer");
         });
