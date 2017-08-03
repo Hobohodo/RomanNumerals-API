@@ -1,12 +1,3 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: Thor
- * Date: 01/08/2017
- * Time: 21:50
- */
-?>
-
 <h1>Hello Numeral McNumberFace</h1>
 <p>I am ready to serve</p>
 

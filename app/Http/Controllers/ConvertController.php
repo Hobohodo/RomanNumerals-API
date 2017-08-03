@@ -8,6 +8,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Conversion;
 use App\IntegerConversion;
 use Illuminate\Http\Request;
 
@@ -24,11 +25,15 @@ class ConvertController extends Controller
 
         $integerConverter = new IntegerConversion();
 
-        $romanNumeral = $integerConverter->toRomanNumerals($integer);
+        $romanNumeral = $integerConverter->toRomanNumerals(intval($integer));
+
+        $conversion = Conversion::create(array(
+            "integer" => $integer,
+            "numeral" => $romanNumeral
+        ));
 
 
-        return view("home", ["integer" => $integer]);
-        //TODO:store conversion, increment number of conversions, change view
+        return view("conversion", ["conversion" => $conversion]);
     }
 
 }
