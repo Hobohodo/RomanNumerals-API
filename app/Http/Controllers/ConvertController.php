@@ -43,42 +43,34 @@ class ConvertController extends Controller
 
         $integerConverter = new IntegerConversion();
 
-        try {
-            if(empty($integer)){
-                throw new \InvalidArgumentException("No integer given to convert. Please pass any value to be converted using 'integer' in your request", 400);
-            }
-
-            $romanNumeral = $integerConverter->toRomanNumerals(intval($integer));
-
-            //store conversion
-            $conversion = Conversion::create([
-                "integer" => $integer,
-                "numeral" => $romanNumeral
-            ]);
-
-
-            //update Conversion Totals
-            $total = Total::firstOrNew(["integer" => $integer]);
-
-            if($total->exists) { //record already exists, increment counter
-                $conversionCount = $total->total +1;
-            } else { //first time converting
-                $conversionCount = 1;
-            }
-
-            $total->setAttribute("total", $conversionCount);
-            $total->save();
-
-            //create Resource to return
-            $fractal = new Manager();
-            $resource = new Item($conversion, new ConversionTransformer());
-
-        } catch(\Exception $ex) {
-            return response()->json([
-                "error" => $ex->getCode(),
-                "message" => $ex->getMessage()
-            ]);
+        if(empty($integer)){
+            throw new \InvalidArgumentException("No integer given to convert. Please pass any value to be converted using 'integer' in your request", 400);
         }
+
+        $romanNumeral = $integerConverter->toRomanNumerals(intval($integer));
+
+        //store conversion
+        $conversion = Conversion::create([
+            "integer" => $integer,
+            "numeral" => $romanNumeral
+        ]);
+
+        //update Conversion Totals
+        $total = Total::firstOrNew(["integer" => $integer]);
+
+        if($total->exists) { //record already exists, increment counter
+            $conversionCount = $total->total +1;
+        } else { //first time converting
+            $conversionCount = 1;
+        }
+
+        $total->setAttribute("total", $conversionCount);
+        $total->save();
+
+        //create Resource to return
+        $fractal = new Manager();
+        $resource = new Item($conversion, new ConversionTransformer());
+
         return response($fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
     }
 
@@ -89,24 +81,17 @@ class ConvertController extends Controller
      */
     public function recent(Request $request) {
 
-        try {
-            $timePeriod = $request->get("period", self::PERIOD_WEEK);
-            $startDate = $this->getStartDate($timePeriod);
+        $timePeriod = $request->get("period", self::PERIOD_WEEK);
+        $startDate = $this->getStartDate($timePeriod);
 
-            $recentConversions = Conversion::whereDate('updated_at', '>', $startDate)->orderBy('updated_at', 'DESC')->get();
+        $recentConversions = Conversion::whereDate('updated_at', '>', $startDate)->orderBy('updated_at', 'DESC')->get();
 
-            $fractal = new Manager();
-            //Always include timestamps for most recent conversions
-            $fractal->parseIncludes("timestamps");
+        $fractal = new Manager();
+        //Always include timestamps for most recent conversions
+        $fractal->parseIncludes("timestamps");
 
-            $resource = new Collection($recentConversions, new ConversionTransformer());
+        $resource = new Collection($recentConversions, new ConversionTransformer());
 
-        } catch(\Exception $ex) {
-            return response()->json([
-                "error" => $ex->getCode(),
-                "message" => $ex->getMessage()
-            ]);
-        }
         return response($fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
     }
 
@@ -117,26 +102,18 @@ class ConvertController extends Controller
      */
     public function common(Request $request) {
 
-        try {
-            $commonConversions = Total::orderBy('total', 'DESC')->limit(self::COMMON_LIMIT)->get();
+        $commonConversions = Total::orderBy('total', 'DESC')->limit(self::COMMON_LIMIT)->get();
 
-            $fractal = new Manager();
+        $fractal = new Manager();
 
-            $includeTimestamps = $request->get("timestamps", false);
-            if($includeTimestamps){
-                $fractal->parseIncludes("timestamps");
-            }
-
-
-            $resource = new Collection($commonConversions, new TotalTransformer());
-
-        } catch(\Exception $ex) {
-            //exception handling is poor, but prevents the entire stack trace from being shown to the user
-            return response()->json([
-                "error" => $ex->getCode(),
-                "message" => $ex->getMessage()
-            ]);
+        $includeTimestamps = $request->get("timestamps", false);
+        if($includeTimestamps){
+            $fractal->parseIncludes("timestamps");
         }
+
+
+        $resource = new Collection($commonConversions, new TotalTransformer());
+
         return response($fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
     }
 
@@ -165,5 +142,4 @@ class ConvertController extends Controller
 
         return $startDate->toDateString();
     }
-
 }
