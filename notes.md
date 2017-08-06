@@ -156,3 +156,5 @@ with using the "includes" method from Fractal\Transformer.
 constants to help with the logic and either have a foreach() loop over valid time periods or use an associative array and just find the index.
 
 * Removed blade templates as everything is now working using JSON.
+
+* Decided to look up Exception Handling and found a much nicer way using Laravel - tried to implement that
