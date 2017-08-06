@@ -33,7 +33,22 @@ class ConvertController extends Controller
         ));
 
 
+        //TODO: Return Fractal Collection
         return view("conversion", ["conversion" => $conversion]);
+    }
+
+    public function recent(Request $request) {
+        $lastWeekStart = strtotime("-1 week");
+
+        $lastWeek = date("Y-m-d", $lastWeekStart);
+
+        $recent = Conversion::whereTime("updated_at", ">", $lastWeek);
+
+        //TODO: Return Fractal collection
+    }
+
+    public function mostCommon(Request $request) {
+        //TODO: Get "Totals", return Fractal Conversion
     }
 
 }

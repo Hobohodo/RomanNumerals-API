@@ -76,3 +76,5 @@ Here is where I gave up on Laravel/Homestead. I didn't write anything in the log
 * I was initially going to have the Numerals table use an "index" on the integer column. This would have interfered with the requirement to view the most recently stored integers, and so was removed.
 
 * I also initially created the "Numerals" table using `php artisan make:migration create_numerals_table --table=numerals` instead of using php `model:make model Numerals -m`. This wasn't really a mistake, just inefficient.
+
+* Realised that effective use of Fractal resources would make it much easier to work with a `totals` table, so going to make one now.
