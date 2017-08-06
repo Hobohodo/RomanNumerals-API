@@ -4,14 +4,18 @@
 
 For the database I only created the one "conversions" table, and used an index to make finding rows based on the integers easy. I considered using multiple tables for this - one to act as a cache of converted integers (with the most recently converted date) and another to store the counts, but realised this would fail to show an accurate history if the same integer were converted multiple times.
 
-I set the number of characters for the "numeral" field to 32, but did cheat a bit and find that the longest possible conversion was from 3888 with 15 characters at MMMDCCCLXXXVIII.
+I set the number of characters for the "numeral" field to 32, but did cheat a bit and find that the longest possible conversion was from 3888 with 15 characters at MMMDCCCLXXXVIII. It might then have made more sense to set the limit for the numeral column to '15', however I didn't in case my test was wrong or for future changes.
+
+
 
 ##What I would do differently
 
 I would most definitely not name the conversion totals table "total" and give the column name "total". It just made naming unnecessarily complex. 
 
+
+
 ##Running commentary
-This is a list of thoughts and comments done while writing the test. Imported from OneNote.
+This is a list of thoughts and comments done while writing the test, initally imported from OneNote.
 
 The first half is a long list of failures, with some more constructive thoughts later on.
 
@@ -83,3 +87,5 @@ Here is where I gave up on Laravel/Homestead. I didn't write anything in the log
 * Now using the Fractal Transformers to return data - the ConversionTransformer works better just returning the integer and roman numerals, but the client may want to view the "most recent" data as well. It looks like this would be best dealt with using the "includes" method from Fractal\Transformer.
 
 * Created a TimestampTransformer that can work for any Eloquent model - gated by the Parent Transformers at the moment.
+
+* After adding the ability to specify a time period for the recent conversions, I've had a look at the controller and really don't like how messy the code is. I'm not sure whether to create a service for recent conversions, or to try and leave it as it is.

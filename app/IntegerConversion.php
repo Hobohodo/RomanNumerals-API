@@ -6,6 +6,7 @@ namespace App;
 use InvalidArgumentException;
 
 /**
+ * This class exists to perform integer conversions to various formats.
  * Class IntegerConversion
  * @package App
  */
@@ -39,11 +40,11 @@ class IntegerConversion implements IntegerConversionInterface
     public function toRomanNumerals($integer) {
         if(!is_int($integer)) {
             //passing a non-integer to IntegerConversion is just wrong.
-            throw new InvalidArgumentException("Non-integer passed for conversion");
+            throw new InvalidArgumentException("Non-integer passed for conversion", 400);
         }
 
         if($integer < 1 || $integer > 3999) {
-            throw new InvalidArgumentException("Integer passed for conversion outside valid range");
+            throw new InvalidArgumentException("Integer passed for conversion outside valid range", 400);
         }
 
         $romanNumeral = "";
