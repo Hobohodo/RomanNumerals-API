@@ -5,4 +5,6 @@ Homestead.yaml
 Homestead.json
 .env
 .idea/
-Vagrantfile
+.phpstorm.meta.php
+_ide_helper.php
+composer.phar

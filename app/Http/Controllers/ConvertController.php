@@ -33,7 +33,7 @@ class ConvertController extends Controller
     const ALLOWED_PERIODS = [self::PERIOD_DAY, self::PERIOD_WEEK, self::PERIOD_MONTH];
 
     /**
-     * Take an integer and convert it into a roman numeral.
+     * Take an integer and convert it into a roman numeral, storing the conversion.
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -49,15 +49,16 @@ class ConvertController extends Controller
             }
 
             $romanNumeral = $integerConverter->toRomanNumerals(intval($integer));
-            //store this conversion
+
+            //store conversion
             $conversion = Conversion::create([
                 "integer" => $integer,
                 "numeral" => $romanNumeral
             ]);
 
 
+            //update Conversion Totals
             $total = Total::firstOrNew(["integer" => $integer]);
-
 
             if($total->exists) { //record already exists, increment counter
                 $conversionCount = $total->total +1;
