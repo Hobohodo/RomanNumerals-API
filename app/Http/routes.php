@@ -1,11 +1,8 @@
 <?php
 
-Route::get('/', function() {
-    //file_put_contents('php://stdout', "hello");
-    return view('home', ["integer" => null]);
-});
-
 /** This route is used to convert an integer.
- * Not currently using the "/convert/{$id}" syntax as unsure on how to place input into URL from view.
+ * Not currently using the "/convert/{$id}" syntax as wanted to use Request objects.
  */
-Route::post("/convert", "ConvertController@convert");
+Route::get('/convert', "ConvertController@convert");
+
+Route::get("/recent", "ConvertController@recent");

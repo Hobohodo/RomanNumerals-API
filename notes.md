@@ -79,3 +79,5 @@ Here is where I gave up on Laravel/Homestead. I didn't write anything in the log
 * I also initially created the "Numerals" table using `php artisan make:migration create_numerals_table --table=numerals` instead of using php `model:make model Numerals -m`. This wasn't really a mistake, just inefficient.
 
 * Realised that effective use of Fractal resources would make it much easier to work with a `totals` table, so going to make one now.
+
+* Now using the Fractal Transformers to return data - the ConversionTransformer works better just returning the integer and roman numerals, but the client may want to view the "most recent" data as well. It looks like this would be best dealt with using the "includes" method from Fractal\Transformer.

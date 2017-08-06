@@ -9,10 +9,13 @@ namespace App\Http\Controllers;
 
 
 use App\Conversion;
+use App\ConversionTransformer;
 use App\IntegerConversion;
 use App\Total;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
 
 class ConvertController extends Controller
 {
@@ -23,45 +26,70 @@ class ConvertController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function convert(Request $request) {
+
         $integer = $request->input('integer');
 
         $integerConverter = new IntegerConversion();
 
-        $romanNumeral = $integerConverter->toRomanNumerals(intval($integer));
+        try {
+            $romanNumeral = $integerConverter->toRomanNumerals(intval($integer));
 
-        $conversion = Conversion::create(array(
-            "integer" => $integer,
-            "numeral" => $romanNumeral
-        ));
+            $conversion = Conversion::create([
+                "integer" => $integer,
+                "numeral" => $romanNumeral
+            ]);
 
-        $total = Total::firstOrNew(array("integer" => $integer));
+            //sort out the conversions
+            $total = Total::firstOrNew(["integer" => $integer]);
 
-        if($total->exists) {
-            $newTotal = $total->total + 1;
-            echo $newTotal;
-            $total->setAttribute("total", $newTotal);
-            $total->save();
-        } else {
-            $total->setAttribute("total", 1);
-            $total->save();
+            if ($total->exists) {
+                $newTotal = $total->total + 1;
+                echo $newTotal;
+                $total->setAttribute("total", $newTotal);
+                $total->save();
+            } else {
+                $total->setAttribute("total", 1);
+                $total->save();
+            }
+
+            $fractal = new Manager();
+
+            $resource = new Item($conversion, new ConversionTransformer());
+
+        } catch(\Exception $ex) {
+            //exception handling is poor, but prevents the entire stack trace from being shown to the user
+            return response()->json([
+                "error" => $ex->getCode(),
+                "message" => $ex->getMessage()
+            ]);
         }
-
-        //TODO: Return Fractal Collection
-        return view("conversion", ["conversion" => $conversion]);
+        return response()->json($fractal->createData($resource)->toJson());
     }
 
     public function recent(Request $request) {
-        $lastWeekStart = strtotime("-1 week");
+        try {
+            //TODO:Use the request to determine the start date
+            $lastWeekStart = strtotime("-1 week");
+            $lastWeek = date('Y-m-d', $lastWeekStart);
 
-        $lastWeek = date("Y-m-d", $lastWeekStart);
+            $recentConversions = Conversion::whereDate('updated_at', '>', $lastWeek)->orderBy('updated_at', 'DESC')->get();
 
-        $recent = Conversion::whereTime("updated_at", ">", $lastWeek);
+            $fractal = new Manager();
+            $fractal->parseIncludes("timestamps");
 
-        //TODO: Return Fractal collection
+            $resource = new Collection($recentConversions, new ConversionTransformer());
+        } catch(\Exception $ex) {
+            //exception handling is poor, but prevents the entire stack trace from being shown to the user
+            return response()->json([
+                "error" => $ex->getCode(),
+                "message" => $ex->getMessage()
+            ]);
+        }
+        return response()->json($fractal->createData($resource)->toJson());
     }
 
-    public function mostCommon(Request $request) {
-        //TODO: Get "Totals", return Fractal Conversion
+    public function common(Request $request) {
+        //TODO: return Fractal Conversion
     }
 
 }
