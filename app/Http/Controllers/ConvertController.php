@@ -10,7 +10,9 @@ namespace App\Http\Controllers;
 
 use App\Conversion;
 use App\IntegerConversion;
+use App\Total;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ConvertController extends Controller
 {
@@ -32,6 +34,17 @@ class ConvertController extends Controller
             "numeral" => $romanNumeral
         ));
 
+        $total = Total::firstOrNew(array("integer" => $integer));
+
+        if($total->exists) {
+            $newTotal = $total->total + 1;
+            echo $newTotal;
+            $total->setAttribute("total", $newTotal);
+            $total->save();
+        } else {
+            $total->setAttribute("total", 1);
+            $total->save();
+        }
 
         //TODO: Return Fractal Collection
         return view("conversion", ["conversion" => $conversion]);

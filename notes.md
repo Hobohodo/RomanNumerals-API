@@ -8,6 +8,7 @@ I set the number of characters for the "numeral" field to 32, but did cheat a bi
 
 ##What I would do differently
 
+I would most definitely not name the conversion totals table "total" and give the column name "total". It just made naming unnecessarily complex. 
 
 ##Running commentary
 This is a list of thoughts and comments done while writing the test. Imported from OneNote.
