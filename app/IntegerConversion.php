@@ -44,7 +44,7 @@ class IntegerConversion implements IntegerConversionInterface
         }
 
         if($integer < 1 || $integer > 3999) {
-            throw new InvalidArgumentException("Integer passed for conversion outside valid range", 400);
+            throw new InvalidArgumentException("Invalid integer passed for conversion", 400);
         }
 
         $romanNumeral = "";
