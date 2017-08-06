@@ -21,6 +21,8 @@ use League\Fractal\Resource\Item;
 
 class ConvertController extends Controller
 {
+    /** @var Manager manager used to present responses */
+    protected $fractal;
 
     /** @const int number of records to retrieve for a "common" request */
     const COMMON_LIMIT = 10;
@@ -32,8 +34,13 @@ class ConvertController extends Controller
     /** @const array valid time periods for "recent" call */
     const ALLOWED_PERIODS = [self::PERIOD_DAY, self::PERIOD_WEEK, self::PERIOD_MONTH];
 
+    public function __construct(){
+        $this->fractal = new Manager();
+    }
+
     /**
      * Take an integer and convert it into a roman numeral, storing the conversion.
+     *
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -57,25 +64,18 @@ class ConvertController extends Controller
 
         //update Conversion Totals
         $total = Total::firstOrNew(["integer" => $integer]);
-
-        if($total->exists) { //record already exists, increment counter
-            $conversionCount = $total->total +1;
-        } else { //first time converting
-            $conversionCount = 1;
-        }
-
-        $total->setAttribute("total", $conversionCount);
+        $total->total++;
         $total->save();
 
         //create Resource to return
-        $fractal = new Manager();
         $resource = new Item($conversion, new ConversionTransformer());
 
-        return response($fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
+        return response($this->fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
     }
 
     /**
      * Get the most recent Conversions and show them to the end user
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -86,17 +86,17 @@ class ConvertController extends Controller
 
         $recentConversions = Conversion::whereDate('updated_at', '>', $startDate)->orderBy('updated_at', 'DESC')->get();
 
-        $fractal = new Manager();
         //Always include timestamps for most recent conversions
-        $fractal->parseIncludes("timestamps");
+        $this->fractal->parseIncludes("timestamps");
 
         $resource = new Collection($recentConversions, new ConversionTransformer());
 
-        return response($fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
+        return response($this->fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
     }
 
     /**
      * Return the top 10 most commonly requested integer conversions
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -104,21 +104,18 @@ class ConvertController extends Controller
 
         $commonConversions = Total::orderBy('total', 'DESC')->limit(self::COMMON_LIMIT)->get();
 
-        $fractal = new Manager();
-
-        $includeTimestamps = $request->get("timestamps", false);
-        if($includeTimestamps){
-            $fractal->parseIncludes("timestamps");
+        if($request->get("timestamps", false)){
+            $this->fractal->parseIncludes("timestamps");
         }
-
 
         $resource = new Collection($commonConversions, new TotalTransformer());
 
-        return response($fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
+        return response($this->fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
     }
 
     /**
      * Retrieve a date string a set period of time before now
+     *
      * @param $timePeriod string period of time to search
      * @return string
      */
