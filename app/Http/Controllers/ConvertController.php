@@ -69,8 +69,8 @@ class ConvertController extends Controller
             $total->setAttribute("total", $conversionCount);
             $total->save();
 
+            //create Resource to return
             $fractal = new Manager();
-
             $resource = new Item($conversion, new ConversionTransformer());
 
         } catch(\Exception $ex) {
@@ -118,7 +118,6 @@ class ConvertController extends Controller
     public function common(Request $request) {
 
         try {
-
             $commonConversions = Total::orderBy('total', 'DESC')->limit(self::COMMON_LIMIT)->get();
 
             $fractal = new Manager();
@@ -154,7 +153,8 @@ class ConvertController extends Controller
 
         $currentDate = Carbon::today();
 
-        //Check available options
+        //Check available options and change date accordingly.
+        // This is not nicely done right now as it doesn't work nicely with added options.
         if($timePeriod === self::PERIOD_DAY) {
             $startDate = $currentDate->copy()->subDay();
         } else if($timePeriod === self::PERIOD_WEEK) {
@@ -162,7 +162,6 @@ class ConvertController extends Controller
         } else {
             $startDate = $currentDate->copy()->subMonth();
         }
-
 
         return $startDate->toDateString();
     }
