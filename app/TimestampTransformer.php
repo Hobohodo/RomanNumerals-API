@@ -20,7 +20,7 @@ class TimestampTransformer extends TransformerAbstract
      */
     public function transform(Model $model) {
         return [
-            'last_converted' => $model->updated_at
+            'last_converted' => $model->updated_at->toDateTimeString()
         ];
 
     }

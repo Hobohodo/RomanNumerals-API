@@ -6,3 +6,5 @@
 Route::get('/convert', "ConvertController@convert");
 
 Route::get("/recent", "ConvertController@recent");
+
+Route::get('/common', "ConvertController@common");

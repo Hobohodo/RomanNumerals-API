@@ -12,6 +12,7 @@ use App\Conversion;
 use App\ConversionTransformer;
 use App\IntegerConversion;
 use App\Total;
+use App\TotalTransformer;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -33,7 +34,6 @@ class ConvertController extends Controller
 
         try {
             $romanNumeral = $integerConverter->toRomanNumerals(intval($integer));
-
             $conversion = Conversion::create([
                 "integer" => $integer,
                 "numeral" => $romanNumeral
@@ -67,10 +67,11 @@ class ConvertController extends Controller
     }
 
     public function recent(Request $request) {
+        //TODO:Use the request to determine the start date
+        $lastWeekStart = strtotime("-1 week");
+        $lastWeek = date('Y-m-d', $lastWeekStart);
+
         try {
-            //TODO:Use the request to determine the start date
-            $lastWeekStart = strtotime("-1 week");
-            $lastWeek = date('Y-m-d', $lastWeekStart);
 
             $recentConversions = Conversion::whereDate('updated_at', '>', $lastWeek)->orderBy('updated_at', 'DESC')->get();
 
@@ -85,11 +86,27 @@ class ConvertController extends Controller
                 "message" => $ex->getMessage()
             ]);
         }
-        return response()->json($fractal->createData($resource)->toJson());
+        return response($fractal->createData($resource)->toJson())->json();
     }
 
     public function common(Request $request) {
-        //TODO: return Fractal Conversion
+
+        try {
+            $commonConversions = Total::orderBy('total', 'DESC')->limit(10)->get();
+
+            $fractal = new Manager();
+            $fractal->parseIncludes("timestamps");
+
+            $resource = new Collection($commonConversions, new TotalTransformer());
+
+        } catch(\Exception $ex) {
+            //exception handling is poor, but prevents the entire stack trace from being shown to the user
+            return response()->json([
+                "error" => $ex->getCode(),
+                "message" => $ex->getMessage()
+            ]);
+        }
+        return response($fractal->createData($resource)->toJson())->header("Content-Type", "application/json");
     }
 
 }
