@@ -44,6 +44,10 @@ class ConvertController extends Controller
         $integerConverter = new IntegerConversion();
 
         try {
+            if(empty($integer)){
+                throw new \InvalidArgumentException("No integer given to convert. Please pass any value to be converted using 'integer' in your request", 400);
+            }
+
             $romanNumeral = $integerConverter->toRomanNumerals(intval($integer));
             //store this conversion
             $conversion = Conversion::create([
@@ -149,7 +153,7 @@ class ConvertController extends Controller
 
         $currentDate = Carbon::today();
 
-
+        //Check available options
         if($timePeriod === self::PERIOD_DAY) {
             $startDate = $currentDate->copy()->subDay();
         } else if($timePeriod === self::PERIOD_WEEK) {
