@@ -2,6 +2,15 @@
 
 This is just a summary of my thoughts while doing the test.
 
+##Usage
+
+There are 3 endpoints to the given API:
+1) `convert` will take a variable `integer` and return the provided integer and a roman numeral.
+2) `recent` will list all recently converted integers. You can pass through a `period` variable of day, week or month to 
+change the time limit.
+3) `common` will list the 10 most commonly converted integers. You can send `timestamps = true` to view when these were 
+most recently converted.
+
 ##Thoughts
 
 For the database I only created the one "conversions" table, and used an index to make finding rows based on the integers 
@@ -52,6 +61,8 @@ were expanded into more generic "metadata", but not good for the current API end
 * Create a 'unique' option when listing recent transactions, to select from the Totals table instead of the conversions.
 
 * Make use of pagination/variable limits for the common and recent endpoints.
+
+* Use branches in git, I didn't due to the size of the test but should have done to keep better track of changes.
 
 ##Running commentary
 This is a list of thoughts and comments done while writing the test, initially imported from OneNote.
